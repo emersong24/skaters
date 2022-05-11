@@ -1,0 +1,43 @@
+body {
+  background: #ffdc43;
+  color: #4a4a4a;
+  text-shadow: 0px 0px 1px black;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 40px 100px;
+}
+
+h1 {
+  font-style: italic;
+}
+td,
+th {
+  vertical-align: middle !important;
+}
+td div {
+  background-size: cover;
+  width: 60px;
+  height: 60px;
+}
+
+input {
+  text-align: center;
+}
+
+.registerPhoto {
+  background-position: center;
+  background-size: cover;
+  height: 200px;
+  width: 200px;
+  margin: auto;
+  border-radius: 100px;
+  border: 1px solid white;
+  margin-bottom: 10px;
+}
+
+.input_info {
+  display: none;
+  color: cadetblue;
+  text-shadow: none;
+  font-style: italic;
+}

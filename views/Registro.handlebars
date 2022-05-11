@@ -1,0 +1,176 @@
+    <h1>Skate Park</h1>
+
+    <div class="py-4">
+      <h2>Registro</h2>
+      <hr class="w-50" />
+
+      <form id="form">
+
+         <div class="row w-50 m-auto">
+      <div id="registerPhoto"style="background-image: url(/public/fotos/{{data.foto}})" class="registerPhoto"></div>
+       <div class="col-12 col-sm-12"> 
+      
+        
+        <input id="photoFile" type="file" name="photo" class="form-control m-auto" validated="false" accept="image/*" onchange="localReadAndPreviewPhoto(this)"/>
+         </div>
+        <div class="form-group row w-100 m-auto">
+          <div class="form-group col-12 col-sm-6">
+            <label>Email</label>
+            <input id="email" name="email" class="form-control m-auto" validated="false" onkeyup="validateEmail(this)"/>
+            <p class="input_info">Campo obligatorio. Formato aaa@aaa.aa</p>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Nombre</label>
+            <input id="nombre" name="nombre" class="form-control m-auto" validated="false" onkeyup="validateNombre(this)"/>
+            <p class="input_info">Campo obligatorio. No puede tener mas de 30 caracteres</p>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Password</label>
+            <input id="password" name="password" class="form-control m-auto" validated="false" onkeyup="validatePassword(this)" />
+            <p class="input_info">Campo obligatorio. No puede tener mas de 30 caracteres</p>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Repita la password</label>
+            <input id="confirmedPassword" name="confirmedPassword" class="form-control m-auto" validated="false" onkeyup="validateConfirmedPassword(this)"/>
+            <p class="input_info">Campo obligatorio. Debe ser idéntico al campo Password</p>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Años de experiencia</label>
+            <input id="anos_experiencia" name="anos_experiencia"  type="number" min="0" max="60" class="form-control m-auto" validated="false" onchange="validateAnosExperiencia(this)" />
+            <p class="input_info">Campo obligatorio. Debe ser un numero desde 0 hasta 60</p>
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Especialidad</label>
+            <input id="especialidad" name="especialidad" class="form-control m-auto" validated="false" onkeyup="validateEspecialidad(this)"/>
+            <p class="input_info">Campo obligatorio. No puede tener más de 20 caracteres</p>
+          </div>
+         
+        <button class="btn btn-info mb-3 offset-4 col-4" >Registrarme</button>
+      
+        </div>
+          <p class ="m-auto"><a href="#"> Iniciar sesión</a></p>
+      </form>
+
+  
+    </div>
+
+<script>
+
+const registeredEmails = '{{registeredEmails}}'.split(",")
+console.log(registeredEmails);
+const localReadAndPreviewPhoto = (input) => {
+            if (input.files && input.files[0]) {
+               
+                var reader = new FileReader();
+                 $('#registerPhoto')[0].validated="true"
+                reader.onload = function (e) {
+                    $('#registerPhoto')
+                        [0].style.backgroundImage= `url(${e.target.result})` ;
+                      $('#registerPhoto')
+                        [0].style.border= `none` ;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+//Funciones de validación de formulario 
+
+const form = document.getElementById("form");
+
+form.addEventListener("submit",async(e)=>{
+  e.preventDefault()
+let inputArrayWithoutPhoto =  [...document.querySelectorAll("input")].splice(1)
+console.log(inputArrayWithoutPhoto)
+if (inputArrayWithoutPhoto.some((i)=>i.attributes.validated.value==="false")){alert("Hay al menos un campo incorrecto. Por favor corregir e intentar nuevamente."); return}
+if ($("#photoFile")[0].files.length===0){alert("Debes subir una imagen para tu perfil."); return}
+const form2 = new FormData(form)
+const {data} = await axios.post("/Registro",form2, {Headers: {'Content-type': 'multipart/form-data'}})
+
+alert(data.message)
+window.location = data.url
+
+})
+
+
+const validateEmail = (email)=>{
+
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+   if( re.test(String(email.value).toLowerCase())&& !registeredEmails.find((e)=>e === email.value))
+   {
+     email.style.backgroundColor="paleGreen"; 
+     email.setAttribute("validated","true");
+     email.nextElementSibling.style.display="none"}
+
+     
+   else if(registeredEmails.find((e)=>e === email.value)){
+      alert(`El email ${email.value} ya está registrado en nuestra base de datos.`)
+      email.value=""
+    } 
+    
+   else{email.style.backgroundColor ="pink";
+   email.nextElementSibling.style.display="block"
+  email.setAttribute("validated","false")}
+  }
+
+
+const validateNombre = (nombre)=>{
+  if (nombre.value.length>0 && nombre.value.length <30){nombre.style.backgroundColor="paleGreen";
+   nombre.setAttribute("validated","true");
+    nombre.nextElementSibling.style.display="none"
+  }
+  else{nombre.style.backgroundColor ="pink"; 
+  nombre.nextElementSibling.style.display="block"
+  nombre.setAttribute("validated","false")}
+
+}
+
+const validatePassword = (password)=>{
+   if (password.value.length>0 && password.value.length <30){password.style.backgroundColor="paleGreen";
+   password.setAttribute("validated","true");
+    password.nextElementSibling.style.display="none"
+  }
+  else{password.style.backgroundColor ="pink"; 
+  password.nextElementSibling.style.display="block"
+  password.setAttribute("validated","false")}
+
+}
+
+const validateConfirmedPassword = (cPassword)=>{
+  let passwordValue = $("#password")[0].value
+  let cPasswordValue =cPassword.value
+   if (cPasswordValue === passwordValue){cPassword.style.backgroundColor="paleGreen";
+   cPassword.setAttribute("validated","true");
+    cPassword.nextElementSibling.style.display="none"
+  }
+  else{cPassword.style.backgroundColor ="pink"; 
+  cPassword.nextElementSibling.style.display="block"
+  cPassword.setAttribute("validated","false")}
+
+}
+
+const validateAnosExperiencia = (anos)=>{
+  const re = /^[0-80]\d*$/
+  if (re.test(anos.value)){anos.style.backgroundColor="paleGreen";
+   anos.setAttribute("validated","true");
+    anos.nextElementSibling.style.display="none"
+  }
+  else{anos.style.backgroundColor ="pink"; 
+  anos.nextElementSibling.style.display="block"
+  anos.setAttribute("validated","false")}
+
+}
+
+
+const validateEspecialidad = (especialidad)=>{
+  if (especialidad.value.length>0 && especialidad.value.length <20){especialidad.style.backgroundColor="paleGreen";
+   especialidad.setAttribute("validated","true");
+    especialidad.nextElementSibling.style.display="none"
+  }
+  else{especialidad.style.backgroundColor ="pink"; 
+  especialidad.nextElementSibling.style.display="block"
+  especialidad.setAttribute("validated","false")}
+
+}
+
+</script>
